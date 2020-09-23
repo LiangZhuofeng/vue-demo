@@ -1,40 +1,98 @@
 <template>
   <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
+    <div>
+      <el-button
+        type="primary"
+        @click="deliverMsg">
+        {{ msg }}
+      </el-button>
+      <el-button
+        type="primary"
+        @click="getJokeList">
+        获取段子列表
+      </el-button>
+      <el-button
+        v-auth="['auth']"
+        type="danger"
+        @click="getInfo">
+        {{ this.$attrs.title }}
+      </el-button>
+    </div>
+    <div>
+      <authority :auth="['admin']">
+        <el-button
+          type="success"
+          @click="getEvent">提交</el-button>
+      </authority>
+    </div>
   </div>
 </template>
 
 <script>
+import { MXG_API, OPEN_API } from '@/api/request'
+
 export default {
   name: 'HelloWorld',
   props: {
-    msg: String
+    msg: {
+      type: String,
+      default: ''
+    }
+  },
+  mounted() {
+    console.log('log========this.$attrs')
+    console.log(this.$attrs)
+    console.log(this.$listeners)
+  },
+  methods: {
+    deliverMsg() {
+      console.log('log========test')
+      console.log('test')
+      this.$emit('showMsg', 'HelloWorld!')
+      this.$listeners.change()
+    },
+
+    getJokeList() {
+      OPEN_API.getJoke({
+        type: 'all',
+        page: '',
+        count: ''
+      }, 'post')
+        .then(res => {
+          console.log('log========joke list')
+          console.log(res)
+        })
+        .catch(err => {
+          console.log('log========joke err')
+          console.log(err)
+        })
+    },
+
+    getInfo() {
+      console.log('log========API')
+      console.log(MXG_API)
+      MXG_API.getQQInfo({ qq: '1244920721' })
+        .then((res) => {
+          console.log('log========res -> qqInfo')
+          console.log(res)
+        })
+        .catch((err) => {
+          console.log('log========err -> err')
+          console.log(err)
+        })
+    },
+
+    getEvent() {
+      MXG_API.getTodayInHistory()
+        .then((res) => {
+          console.log('log========res')
+          console.log(res)
+        })
+        .catch((err) => {
+          console.log('log========err')
+          console.log(err)
+        })
+    }
   }
 }
 </script>
@@ -44,14 +102,17 @@ export default {
 h3 {
   margin: 40px 0 0;
 }
+
 ul {
   list-style-type: none;
   padding: 0;
 }
+
 li {
   display: inline-block;
   margin: 0 10px;
 }
+
 a {
   color: #42b983;
 }
